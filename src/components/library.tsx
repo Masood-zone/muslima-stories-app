@@ -382,7 +382,9 @@ export function Library({ stories }: { stories: Story[] }) {
       </section>
       <footer className="site-footer">
         <div className="site-footer-inner wrap">
-          <div className="footer-brand">Muslima Stories <span aria-hidden="true">✦</span></div>
+          <div className="footer-brand">
+            Muslima Stories <span aria-hidden="true">✦</span>
+          </div>
           <p>Thirteen stories. Countless little lessons.</p>
           <small>© 2020 Muslima Acheampong</small>
         </div>
