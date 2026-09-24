@@ -57,6 +57,55 @@ export function playStorySound(name: SoundName) {
   window.setTimeout(() => void context.close(), (duration + 0.2) * 1000);
 }
 
+export function startAmbientSound() {
+  if (typeof window === "undefined") return () => {};
+  const AudioContextClass = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextClass) return () => {};
+
+  const context = new AudioContextClass();
+  const master = context.createGain();
+  const filter = context.createBiquadFilter();
+  const compressor = context.createDynamicsCompressor();
+  filter.type = "lowpass";
+  filter.frequency.value = 1200;
+  master.gain.value = 0.018;
+  master.connect(filter).connect(compressor).connect(context.destination);
+  const notes = [196, 220, 261.63, 293.66, 329.63, 392, 440, 523.25];
+  let stopped = false;
+  let timer: number | undefined;
+
+  const scheduleNote = () => {
+    if (stopped) return;
+    const oscillator = context.createOscillator();
+    const envelope = context.createGain();
+    const panner = context.createStereoPanner();
+    const now = context.currentTime;
+    const frequency = notes[Math.floor(Math.random() * notes.length)] ?? 261.63;
+    const duration = 2.8 + Math.random() * 2.4;
+    oscillator.type = Math.random() > 0.72 ? "triangle" : "sine";
+    oscillator.frequency.value = frequency;
+    oscillator.detune.value = (Math.random() - 0.5) * 8;
+    panner.pan.value = (Math.random() - 0.5) * 0.65;
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.exponentialRampToValueAtTime(0.22, now + 0.55);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    oscillator.connect(envelope).connect(panner).connect(master);
+    oscillator.start(now);
+    oscillator.stop(now + duration + 0.1);
+    timer = window.setTimeout(scheduleNote, 2200 + Math.random() * 3200);
+  };
+
+  void context.resume();
+  scheduleNote();
+  return () => {
+    stopped = true;
+    if (timer !== undefined) window.clearTimeout(timer);
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setTargetAtTime(0.0001, context.currentTime, 0.25);
+    window.setTimeout(() => void context.close(), 900);
+  };
+}
+
 export function praiseReader() {
   if (typeof window === "undefined" || !soundIsEnabled()) return;
   playStorySound("complete");

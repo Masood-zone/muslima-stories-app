@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "@/app/assets/logo.png";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
@@ -133,9 +134,7 @@ export function Library({ stories }: { stories: Story[] }) {
       <div className="ambient ambient-two" aria-hidden="true" />
       <header className="site-header wrap">
         <Link href="/" className="brand" aria-label="Muslima Stories home">
-          <span className="brand-mark">
-            <BookOpen size={22} strokeWidth={2.1} />
-          </span>
+          <Image className="brand-logo" src={logo} alt="" width={48} height={48} priority />
           <span className="brand-copy">
             <strong>Muslima Stories</strong>
             <small>Little library · Big lessons</small>

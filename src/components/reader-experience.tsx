@@ -9,11 +9,11 @@ import {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "@/app/assets/logo.png";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpen,
   ChevronLeft,
   ChevronRight,
   Feather,
@@ -29,7 +29,7 @@ import type { Story } from "@/lib/stories";
 import { paginate, pageAtOffset, type ReadingPage } from "@/lib/paginate";
 import { PageTurnBook, type PageTurnHandle } from "@/components/page-turn-book";
 import { useTheme } from "@/components/theme-provider";
-import { playStorySound, praiseReader } from "@/lib/sounds";
+import { playStorySound, praiseReader, startAmbientSound } from "@/lib/sounds";
 
 type Phase = "restoring" | "opening" | "intro" | "reading";
 type SavedProgress = { version: 1; view: "intro" | "reading"; offset: number };
@@ -75,14 +75,6 @@ function saveProgress(
   }
 }
 
-function readPreference(key: string, fallback: string) {
-  try {
-    return window.localStorage.getItem(key) ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 export function ReaderExperience({ story }: { story: Story }) {
   const { mode, resolvedTheme, setMode } = useTheme();
   const reduceMotion = useReducedMotion();
@@ -96,13 +88,15 @@ export function ReaderExperience({ story }: { story: Story }) {
   const bookRef = useRef<HTMLDivElement>(null);
   const pageTurnRef = useRef<PageTurnHandle>(null);
   const anchorRef = useRef(0);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const soundGainRef = useRef<GainNode | null>(null);
-  const soundNodesRef = useRef<OscillatorNode[]>([]);
+  const ambientStopRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    const savedSound = readPreference(SOUND_KEY, "off");
-    setSoundEnabled(savedSound === "on");
+    setSoundEnabled(false);
+    try {
+      window.localStorage.setItem(SOUND_KEY, "off");
+    } catch {
+      // Sound remains opt-in for the current page when storage is unavailable.
+    }
   }, []);
 
   useEffect(() => {
@@ -115,59 +109,20 @@ export function ReaderExperience({ story }: { story: Story }) {
 
   useEffect(
     () => () => {
-      const context = audioContextRef.current;
-      soundNodesRef.current.forEach((node) => node.stop());
-      soundNodesRef.current = [];
-      void context?.close();
+      ambientStopRef.current?.();
+      ambientStopRef.current = null;
     },
     [],
   );
 
-  const toggleSound = async () => {
+  const toggleSound = () => {
     if (soundEnabled) {
-      const context = audioContextRef.current;
-      const gain = soundGainRef.current;
-      if (context && gain) {
-        gain.gain.cancelScheduledValues(context.currentTime);
-        gain.gain.setTargetAtTime(0, context.currentTime, 0.18);
-        window.setTimeout(() => {
-          soundNodesRef.current.forEach((node) => node.stop());
-          soundNodesRef.current = [];
-          void context.close();
-          audioContextRef.current = null;
-          soundGainRef.current = null;
-        }, 700);
-      }
+      ambientStopRef.current?.();
+      ambientStopRef.current = null;
       setSoundEnabled(false);
       return;
     }
-
-    const AudioContextClass =
-      window.AudioContext ??
-      (window as typeof window & { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-    if (!AudioContextClass) return;
-    const context = new AudioContextClass();
-    const gain = context.createGain();
-    const filter = context.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 520;
-    gain.gain.value = 0.0001;
-    gain.connect(filter).connect(context.destination);
-    const nodes = [174, 261, 329].map((frequency, index) => {
-      const oscillator = context.createOscillator();
-      oscillator.type = index === 1 ? "sine" : "triangle";
-      oscillator.frequency.value = frequency;
-      oscillator.detune.value = index === 1 ? -3 : index === 2 ? 4 : 0;
-      oscillator.connect(gain);
-      oscillator.start();
-      return oscillator;
-    });
-    await context.resume();
-    gain.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 1.2);
-    audioContextRef.current = context;
-    soundGainRef.current = gain;
-    soundNodesRef.current = nodes;
+    ambientStopRef.current = startAmbientSound();
     setSoundEnabled(true);
   };
 
@@ -297,15 +252,10 @@ export function ReaderExperience({ story }: { story: Story }) {
   return (
     <main className="reader-shell">
       <header className="reader-header wrap">
-        <Link href="/" className="reader-home">
-          <span className="brand-mark small">
-            <BookOpen size={19} />
-          </span>
+        <Link href="/" className="reader-home" aria-label="Muslima Stories home">
+          <Image className="brand-logo reader-logo" src={logo} alt="" width={48} height={48} priority />
           <strong>Muslima Stories</strong>
         </Link>
-        <span className="reader-header-label">
-          A STORY BY MUSLIMA ACHEAMPONG
-        </span>
         <div className="reader-header-actions">
           <button
             type="button"
