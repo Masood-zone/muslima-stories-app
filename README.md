@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Muslima Stories Reader
 
-## Getting Started
+A local, self-contained library for the 13 stories by Muslima Acheampong (2020). Built with Next.js, TypeScript, Tailwind CSS, and Framer Motion.
 
-First, run the development server:
+## Run locally
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Install Node.js 20.9+ and pnpm 11, then run from this folder:
+
+```powershell
+pnpm.cmd install
+pnpm.cmd dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`. For a production check, run `pnpm.cmd build` followed by `pnpm.cmd start`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Story source
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The project includes its own source files: 13 DOCX files in `content/docx` and the supplied PNG artwork in `public/books`. `scripts/import-stories.mjs` reads each DOCX heading and body, checks that the artwork exists, and generates `src/generated/stories.json`. It runs automatically before `dev` and `build`; run `pnpm.cmd import:stories` to refresh the data directly after editing a DOCX.
 
-## Learn More
+Genres and artwork pairings are defined in the import script. Reader page lengths adapt to the available screen space; paragraphs and wording come from the DOCX files.
 
-To learn more about Next.js, take a look at the following resources:
+## Checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```powershell
+pnpm.cmd typecheck
+pnpm.cmd lint
+pnpm.cmd build
+```
