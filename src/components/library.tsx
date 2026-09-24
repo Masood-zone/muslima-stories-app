@@ -134,7 +134,14 @@ export function Library({ stories }: { stories: Story[] }) {
       <div className="ambient ambient-two" aria-hidden="true" />
       <header className="site-header wrap">
         <Link href="/" className="brand" aria-label="Muslima Stories home">
-          <Image className="brand-logo" src={logo} alt="" width={48} height={48} priority />
+          <Image
+            className="brand-logo"
+            src={logo}
+            alt=""
+            width={48}
+            height={48}
+            priority
+          />
           <span className="brand-copy">
             <strong>Muslima Stories</strong>
             <small>Little library · Big lessons</small>

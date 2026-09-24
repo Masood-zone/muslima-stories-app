@@ -252,8 +252,19 @@ export function ReaderExperience({ story }: { story: Story }) {
   return (
     <main className="reader-shell">
       <header className="reader-header wrap">
-        <Link href="/" className="reader-home" aria-label="Muslima Stories home">
-          <Image className="brand-logo reader-logo" src={logo} alt="" width={48} height={48} priority />
+        <Link
+          href="/"
+          className="reader-home"
+          aria-label="Muslima Stories home"
+        >
+          <Image
+            className="brand-logo reader-logo"
+            src={logo}
+            alt=""
+            width={48}
+            height={48}
+            priority
+          />
           <strong>Muslima Stories</strong>
         </Link>
         <div className="reader-header-actions">

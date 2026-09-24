@@ -59,7 +59,10 @@ export function playStorySound(name: SoundName) {
 
 export function startAmbientSound() {
   if (typeof window === "undefined") return () => {};
-  const AudioContextClass = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  const AudioContextClass =
+    window.AudioContext ??
+    (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
   if (!AudioContextClass) return () => {};
 
   const context = new AudioContextClass();
@@ -109,12 +112,4 @@ export function startAmbientSound() {
 export function praiseReader() {
   if (typeof window === "undefined" || !soundIsEnabled()) return;
   playStorySound("complete");
-  if ("speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
-    const praise = new SpeechSynthesisUtterance("Well done!");
-    praise.rate = 0.92;
-    praise.pitch = 1.08;
-    praise.volume = 0.7;
-    window.speechSynthesis.speak(praise);
-  }
 }

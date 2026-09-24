@@ -1353,7 +1353,9 @@ html[data-theme="dark"] .reader-shell::before {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at 80% 0%, rgba(74, 111, 96, 0.24), transparent 34%), radial-gradient(circle at 8% 58%, rgba(190, 139, 75, 0.1), transparent 25%);
+  background:
+    radial-gradient(circle at 80% 0%, rgba(74, 111, 96, 0.24), transparent 34%),
+    radial-gradient(circle at 8% 58%, rgba(190, 139, 75, 0.1), transparent 25%);
 }
 html[data-theme="dark"] .site-header,
 html[data-theme="dark"] .reader-header {
