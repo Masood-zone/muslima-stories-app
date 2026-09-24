@@ -24,6 +24,7 @@ type Props = {
   bookRef: Ref<HTMLDivElement>;
   paperRef: Ref<HTMLDivElement>;
   onCommit: (direction: Direction) => void;
+  onFlipSound: (direction: Direction) => void;
   onBusyChange: (busy: boolean) => void;
 };
 
@@ -42,7 +43,7 @@ function StoryPaper({ page, pageNumber, title, innerRef }: { page?: ReadingPage;
 }
 
 export const PageTurnBook = forwardRef<PageTurnHandle, Props>(function PageTurnBook({
-  pages, currentIndex, wide, title, canBack, canNext, reduceMotion, bookRef, paperRef, onCommit, onBusyChange,
+  pages, currentIndex, wide, title, canBack, canNext, reduceMotion, bookRef, paperRef, onCommit, onFlipSound, onBusyChange,
 }, ref) {
   const [flip, setFlip] = useState<Flip | null>(null);
   const progress = useMotionValue(0);
@@ -81,7 +82,10 @@ export const PageTurnBook = forwardRef<PageTurnHandle, Props>(function PageTurnB
     clearHold();
     animationRef.current?.stop();
     if (reduceMotion) {
-      if (destination === 1) onCommit(direction);
+      if (destination === 1) {
+        onCommit(direction);
+        onFlipSound(direction);
+      }
       finish();
       return;
     }
@@ -92,11 +96,14 @@ export const PageTurnBook = forwardRef<PageTurnHandle, Props>(function PageTurnB
       duration: Math.max(0.22, distance * 0.78),
       ease: [0.23, 0.8, 0.22, 1],
       onComplete: () => {
-        if (destination === 1) onCommit(direction);
+        if (destination === 1) {
+          onCommit(direction);
+          onFlipSound(direction);
+        }
         finish();
       },
     });
-  }, [clearHold, finish, onCommit, progress, reduceMotion]);
+  }, [clearHold, finish, onCommit, onFlipSound, progress, reduceMotion]);
 
   const turn = useCallback((direction: Direction) => {
     if (busyRef.current || !pages.length || (direction === 1 ? !canNext : !canBack)) return;

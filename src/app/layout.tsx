@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import bannerImage from "./assets/banner.png";
 import "./globals.css";
 import { InstallPrompt } from "@/components/install-prompt";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -58,8 +59,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body>
-        {children}
-        <InstallPrompt />
+        <ThemeProvider>
+          {children}
+          <InstallPrompt />
+        </ThemeProvider>
       </body>
     </html>
   );
