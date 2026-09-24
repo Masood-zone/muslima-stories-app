@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import bannerImage from "./assets/banner.png";
 import "./globals.css";
+import { InstallPrompt } from "@/components/install-prompt";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -8,7 +9,7 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Muslima Stories | A little library of big lessons",
+  title: "Muslima Stories Reader",
   description: "Explore thirteen illustrated stories by Muslima Acheampong.",
   applicationName: "Muslima Stories Reader",
   keywords: [
@@ -25,21 +26,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "/",
-    title: "Muslima Stories",
+    title: "Muslima Stories Reader",
     description: "A little library of big lessons from Muslima Acheampong.",
-    siteName: "Muslima Stories",
+    siteName: "Muslima Stories Reader",
     images: [
       {
         url: bannerImage.src,
         width: 1200,
         height: 630,
-        alt: "Muslima Stories banner",
+        alt: "Muslima Stories Reader banner",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Muslima Stories",
+    title: "Muslima Stories Reader",
     description: "A little library of big lessons from Muslima Acheampong.",
     images: [bannerImage.src],
   },
@@ -48,6 +49,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -55,7 +57,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>
+        {children}
+        <InstallPrompt />
+      </body>
     </html>
   );
 }
